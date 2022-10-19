@@ -1,0 +1,6 @@
+/*.o
+/testbench
+/*.cf
+/src/images/*_result.pgm
+/project/*
+!/project/edge-detector.xpr
