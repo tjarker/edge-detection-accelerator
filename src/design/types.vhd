@@ -37,6 +37,14 @@ package types is
     subtype halfword_t is std_logic_vector(15 downto 0);
     subtype word_t is std_logic_vector(31 downto 0);
     subtype doubleword_t is std_logic_vector(63 downto 0);
+    
+    subtype coordinate_t is std_logic_vector(8 downto 0);
+
+    type vector_t is array (natural range <>) of std_logic_vector;
+
+    type matrix_t is array (natural range <>, natural range <>) of std_logic_vector;
+    subtype window_t is matrix_t(0 to 4, 0 to 3)(7 downto 0);
+    subtype block_t is matrix_t(0 to 4, 0 to 4)(7 downto 0);
 
     constant byte_zero : byte_t := "00000000";
     constant byte_one  : byte_t := "11111111";

@@ -2,5 +2,10 @@
 /testbench
 /*.cf
 /src/images/*_result.pgm
-/project/*
-!/project/edge-detector.xpr
+/synthesis/*
+!/synthesis/edge-detector.xpr
+/.bsp
+/.idea
+/target
+/test_run_dir
+/project

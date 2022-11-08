@@ -6,3 +6,9 @@ simulate:
 
 clean:
 	rm *.o testbench *.cf src/images/*_result.pgm
+
+cache: src/design/accelerator/Cache.v
+
+src/design/accelerator/Cache.v: src/main/scala/Cache.scala
+	sbt 'runMain Cache --target-dir src/design/accelerator'
+	rm src/design/accelerator/*.anno.json src/design/accelerator/*.fir
