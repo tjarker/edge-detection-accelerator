@@ -44,10 +44,11 @@ class Cache extends Module {
 
   }
 
-  val evenBankIsToTheRight = in.x(2) && (in.x(1) || in.x(0))
+  val evenBankIsToTheRight = in.x(2) && (in.x(1) || in.x(0)) // equal to x > 4
+  val oddBankIsToTheLeft = in.x(2,0) === 0.U
   val memOut = WireDefault(VecInit(
-    mem(0).read(Mux(evenBankIsToTheRight, in.x(8,3) + 1.U, in.x(8,3))) ++ mem(1).read(in.x(8,3))
-    )) // TODO: this is different between banks
+    mem(0).read(Mux(evenBankIsToTheRight, in.x(8,3) + 1.U, in.x(8,3))) ++ mem(1).read(Mux(oddBankIsToTheLeft, in.x(8,3)-1.U, in.x(8,3)))
+    ))
 
   val shuffleGroups = createShuffleGroups(memOut)
   val shuffledLines = shuffleLines(shuffleGroups, RegNext(in.y(1), 0.B))
