@@ -44,47 +44,74 @@ end acc;
 
 architecture rtl of acc is
 
-    type state_type is ( idle, request, receive, invert, write, done );
+    type state_type is ( idle, delay0, delay1, delay2, busy, finished );
 
     signal state, next_state: state_type;
 
-    signal read_pointer, next_read_pointer, write_pointer, next_write_pointer: unsigned(15 downto 0);
-    signal data, next_data: word_t;
+
+    component Pipeline is
+        port(
+            clock: in  bit_t;
+            reset: in  bit_t;
+    
+            -- memory port
+            mem_enable: out bit_t;
+            mem_address: out halfword_t;
+            mem_read_data: in  word_t;
+            mem_write_data: out word_t;
+            mem_write: out bit_t;
+    
+            fetcher_start: in bit_t;
+            fetcher_done: out bit_t;
+    
+            sequencer_start: in bit_t;
+    
+            writer_done: out bit_t        
+        );
+    end component;
+
+    signal fetcher_start, fetcher_done: bit_t;
+    signal sequencer_start: bit_t;
+    signal writer_done: bit_t;
 
 begin
 
+    pipe: Pipeline port map(
+        clock => clk,
+        reset => reset,
+        mem_enable => en,
+        mem_address => addr,
+        mem_read_data => dataR,
+        mem_write_data => dataW,
+        mem_write => we,
+        fetcher_start => fetcher_start,
+        fetcher_done => fetcher_done,
+        sequencer_start => sequencer_start,
+        writer_done => writer_done
+    );
+
     process(all) begin
-        addr <= std_logic_vector(read_pointer);
-        dataW <= data;
-        en <= '0';
-        we <= '0';
+
+        fetcher_start <= '0';
+        sequencer_start <= '0';
         finish <= '0';
-        next_data <= data;
-        next_read_pointer <= read_pointer;
-        next_write_pointer <= write_pointer;
 
         case state is
             when idle =>
-                next_state <= request when start = '1' else idle;
-            when request =>
-                en <= '1';
-                next_state <= receive;
-            when receive =>
-                next_data <= dataR;
-                next_state <= invert;
-            when invert =>
-                next_data <= not data;
-                next_state <= write;
-            when write =>
-                en <= '1';
-                we <= '1';
-                addr <= std_logic_vector(write_pointer);
-                next_read_pointer <= read_pointer + x"0001";
-                next_write_pointer <= write_pointer + x"0001";
-                next_state <= done when read_pointer = x"62FF" else request;
-            when done =>
+                fetcher_start <= '1';
+                next_state <= delay0 when start = '1' else idle;
+            when delay0 =>
+                next_state <= delay1;
+            when delay1 =>
+                next_state <= delay2;
+            when delay2 =>
+                sequencer_start <= '1';
+                next_state <= busy;
+            when busy =>
+                next_state <= finished when writer_done = '1' else busy;
+            when finished =>
                 finish <= '1';
-                next_state <= done;
+                next_state <= delay0 when start = '1' else finished;
             when others =>
         end case;
 
@@ -92,10 +119,7 @@ begin
 
     process(clk) begin
         if rising_edge(clk) then
-            state <= request when reset = '1' else next_state;
-            read_pointer <= x"0000" when reset = '1' else next_read_pointer;
-            write_pointer <= x"6300" when reset = '1' else next_write_pointer;
-            data <= x"00000000" when reset = '1' else next_data;
+            state <= idle when reset = '1' else next_state;
         end if;
     end process;
 

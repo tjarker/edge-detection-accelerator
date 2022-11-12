@@ -38,8 +38,8 @@ package types is
     subtype word_t is std_logic_vector(31 downto 0);
     subtype doubleword_t is std_logic_vector(63 downto 0);
     
-    type window_t is array (0 to 4, 0 to 3) of byte_t;
-    type neighborhood_t is array (0 to 3, 0 to 3) of byte_t;
+    type window_t is array (0 to 3, 0 to 2) of byte_t;
+    type neighborhood_t is array (0 to 2, 0 to 2) of byte_t;
 
     constant byte_zero : byte_t := "00000000";
     constant byte_one  : byte_t := "11111111";

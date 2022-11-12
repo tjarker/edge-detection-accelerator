@@ -15,10 +15,10 @@ entity Writer is
     
         done: out std_logic;
 
-        addr   : out halfword_t;        -- Address bus for data.
-        dataW  : out word_t;            -- The data bus.
-        en     : out bit_t;             -- Request signal for data.
-        we     : out bit_t             -- Read/Write signal for data.
+        request: out bit_t;
+        granted: in bit_t;
+        address   : out halfword_t;
+        write_data : out word_t
     );
 end entity;
 

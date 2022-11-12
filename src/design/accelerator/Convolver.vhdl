@@ -18,7 +18,7 @@ architecture Behavioral of Convolver is
 begin
 
     -- dummy connection
-    pixel <= neighborhood(1,1);
+    pixel <= not neighborhood(1,1);
 
 
 end architecture;
