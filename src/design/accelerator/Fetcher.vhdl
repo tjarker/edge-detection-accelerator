@@ -17,13 +17,13 @@ entity Fetcher is
         using_memory : out STD_LOGIC;               -- for the writer
 
         en : out STD_LOGIC;                         -- enable main memory
-        addr: out STD_LOGIC_VECTOR (15 downto 0);   -- reading from main memory 
-        dataR : in STD_LOGIC_VECTOR (31 downto 0)); -- reading from main memory
+        address: out STD_LOGIC_VECTOR (15 downto 0);   -- reading from main memory 
+        read_data : in STD_LOGIC_VECTOR (31 downto 0)); -- reading from main memory
 
-        addr_x: out unsigned(8 downto 0);            -- writing to cache
-        addr_y: out unsigned(1 downto 0);            -- writing to cache
-        cache_we: out bit_t;                         --enable writing to cache
-        dataW  : out STD_LOGIC_VECTOR (31 downto 0); -- writing to cache
+        cache_x: out unsigned(8 downto 0);            -- writing to cache
+        cache_y: out unsigned(1 downto 0);            -- writing to cache
+        cache_write: out bit_t;                         --enable writing to cache
+        cache_data  : out STD_LOGIC_VECTOR (31 downto 0); -- writing to cache
     );
 end entity;
 
@@ -49,9 +49,9 @@ signal next_addr, current_addr:  unsigned (15 downto 0);
 signal net:  STD_LOGIC_VECTOR (16 downto 0);
 signal current_addr_x, current_addr_y:  unsigned (8 downto 0);
 signal un_x, un_y: unsigned(8 downto 0);
---signal dataR             : STD_LOGIC_VECTOR (31 downto 0));
+
 begin
-comb : process (state, current_addr, current_addr_x, current_addr_y, start, next_addr, next_addr_x, next_addr_y, dataR, 
+comb : process (state, current_addr, current_addr_x, current_addr_y, start, next_addr, next_addr_x, next_addr_y, read_data, 
 width, widthdec, width2dec, heightdecdec) 
 begin
 next_addr_x <=  current_addr_x;
@@ -59,10 +59,10 @@ next_addr_y <= current_addr_y;
 next_addr <= current_addr;
 done <= '0';
 stall <= '0';
-dataW <= dataR;
+cache_data <= read_data;
 en <= '1';
 using_memory <= '1';
-cache_we <= '0';
+cache_write <= '0';
 case(state) is
     when Setup_read_1 => 
         if(start = '1') then
@@ -74,34 +74,34 @@ case(state) is
             next_state <= Setup_read_1;
         end if;
     when Setup_read_2 =>
-            cache_we <= '1';
+            cache_write <= '1';
             next_addr_y <= current_addr_y + 1;
             next_addr <= current_addr + width;
             next_state <= Loop_1st_row_A;
     when Loop_1st_row_A =>
             if(current_addr_x /= 0) then
                 stall <= '1';
-                cache_we <= '0';
+                cache_write <= '0';
             else 
-                 cache_we <= '1';
+                cache_write <= '1';
             end if; 
             next_addr_x <= current_addr_x + 1;
             next_addr_y <= current_addr_y - 2;
             next_addr <= current_addr - width2dec;   
             next_state <= Loop_1st_row_B;
     when Loop_1st_row_B =>    
-            cache_we <= '1';
+            cache_write <= '1';
             next_addr_y <= current_addr_y + 1; 
             next_addr <= current_addr + width;
             next_state <= Loop_1st_row_C;
     when Loop_1st_row_C =>    
-            cache_we <= '1';
+            cache_write <= '1';
             next_addr_x <= current_addr_x;
             next_addr_y <= current_addr_y + 1; 
             next_addr <= current_addr + width;
             next_state <= Loop_1st_row_DW;
     when Loop_1st_row_DW => 
-            cache_we <= '1';
+            cache_write <= '1';
             using_memory <= '0';
             next_state <= Loop_1st_row_EW;
     when Loop_1st_row_EW =>  
@@ -117,12 +117,12 @@ case(state) is
             next_addr <= current_addr + 1;
             next_state <= Mainloop_A;
       when Mainloop_A =>
-            cache_we <= '1';
+            cache_write <= '1';
             next_addr_y <= current_addr_y + 1; 
             next_addr <= current_addr + width;
             next_state <= Mainloop_B;
       when Mainloop_B =>
-            cache_we <= '1';
+            cache_write <= '1';
             using_memory <= '0';
             next_state <= Mainloop_C;  
       when Mainloop_C => 
@@ -149,7 +149,7 @@ case(state) is
                 next_addr <= current_addr + 1; 
                 next_state <= Loop_last_row_B;               
        when Loop_last_row_B =>
-                cache_we <= '1'; 
+                cache_write <= '1'; 
                 using_memory <= '0';
                 next_state <= Loop_last_row_C;
        when Loop_last_row_C =>
@@ -179,12 +179,12 @@ begin
             current_addr <= (others => '0');
             state <= Setup_read_1;
         else
-            addr_x <= next_next_addr_x;
-            addr_y(0) <= next_next_addr_y(0);
-            addr_y(1) <= next_next_addr_y(1);
+            cache_x <= next_next_addr_x;
+            cache_y(0) <= next_next_addr_y(0);
+            cache_y(1) <= next_next_addr_y(1);
             next_next_addr_y <= std_logic_vector(next_addr_y);
             next_next_addr_x <= std_logic_vector(next_addr_x);
-            addr <= std_logic_vector(next_addr); 
+            address <= std_logic_vector(next_addr); 
             state <= next_state;
             current_addr_x <= next_addr_x; 
             current_addr_y <= next_addr_y; 
