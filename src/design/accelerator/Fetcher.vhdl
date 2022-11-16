@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
 use work.types.all;
+use IEEE.NUMERIC_STD.ALL;
 
 
 entity Fetcher is
@@ -18,20 +18,16 @@ entity Fetcher is
 
         en : out STD_LOGIC;                         -- enable main memory
         address: out STD_LOGIC_VECTOR (15 downto 0);   -- reading from main memory 
-        read_data : in STD_LOGIC_VECTOR (31 downto 0)); -- reading from main memory
+        read_data : in STD_LOGIC_VECTOR (31 downto 0); -- reading from main memory
 
         cache_x: out unsigned(8 downto 0);            -- writing to cache
         cache_y: out unsigned(1 downto 0);            -- writing to cache
         cache_write: out bit_t;                         --enable writing to cache
-        cache_data  : out STD_LOGIC_VECTOR (31 downto 0); -- writing to cache
+        cache_data  : out STD_LOGIC_VECTOR (31 downto 0) -- writing to cache
     );
 end entity;
 
 architecture Behavioral of Fetcher is
-
-
-
-begin
 
 type state_type is (Setup_read_1, Setup_read_2, Loop_1st_row_A, Loop_1st_row_B, Loop_1st_row_C, 
  Loop_1st_row_DW,  Loop_1st_row_EW, Mainloop_switchrow, Mainloop_A, Mainloop_B, Mainloop_C, 
@@ -44,7 +40,7 @@ signal heightdecdec : unsigned(8 downto 0) := ("100011110");
 
 signal state, next_state : state_type;
 signal next_addr_x, next_addr_y : unsigned(8 downto 0);
-signal next_next_addr_x, next_next_addr_y : STD_LOGIC_VECTOR(8 downto 0);
+signal next_next_addr_x, next_next_addr_y : unsigned(8 downto 0);
 signal next_addr, current_addr:  unsigned (15 downto 0);
 signal net:  STD_LOGIC_VECTOR (16 downto 0);
 signal current_addr_x, current_addr_y:  unsigned (8 downto 0);
@@ -170,9 +166,9 @@ case(state) is
    
 end process comb;
 
-seq: process(clk)
+seq: process(clock)
 begin
-    if rising_edge(clk) then
+    if rising_edge(clock) then
         if (reset = '1') then
             current_addr_x <= (others => '0');
             current_addr_y <= (others => '0');
@@ -182,8 +178,8 @@ begin
             cache_x <= next_next_addr_x;
             cache_y(0) <= next_next_addr_y(0);
             cache_y(1) <= next_next_addr_y(1);
-            next_next_addr_y <= std_logic_vector(next_addr_y);
-            next_next_addr_x <= std_logic_vector(next_addr_x);
+            next_next_addr_y <= next_addr_y;
+            next_next_addr_x <= next_addr_x;
             address <= std_logic_vector(next_addr); 
             state <= next_state;
             current_addr_x <= next_addr_x; 
