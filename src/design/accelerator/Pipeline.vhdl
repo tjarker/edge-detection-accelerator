@@ -35,16 +35,18 @@ architecture Behavioral of Pipeline is
             start: in std_logic;
             done: out std_logic;
     
-            stall: out std_logic;
+            stall: out std_logic;                       -- stall into ppipeline during first line
     
-            request: out bit_t;
-            address: out halfword_t;
-            read_data: in word_t;
-
-            cache_x: out unsigned(8 downto 0);
-            cache_y: out unsigned(1 downto 0);
-            cache_write: out bit_t;
-            cache_data: out word_t
+            using_memory : out STD_LOGIC;               -- for the writer
+    
+            en : out STD_LOGIC;                         -- enable main memory
+            address: out STD_LOGIC_VECTOR (15 downto 0);   -- reading from main memory 
+            read_data : in STD_LOGIC_VECTOR (31 downto 0); -- reading from main memory
+    
+            cache_x: out unsigned(8 downto 0);            -- writing to cache
+            cache_y: out unsigned(1 downto 0);            -- writing to cache
+            cache_write: out bit_t;                         --enable writing to cache
+            cache_data  : out STD_LOGIC_VECTOR (31 downto 0) -- writing to cache
         );
     end component;
     
@@ -108,7 +110,7 @@ architecture Behavioral of Pipeline is
 
 
     signal stall_pipeline: bit_t;
-    signal fetcher_mem_request, writer_mem_request, writer_mem_granted: bit_t;
+    signal fetcher_using_mem, fetcher_mem_en, writer_mem_request, writer_mem_granted: bit_t;
     signal fetcher_address, writer_address: halfword_t;
 
     signal cache_write_x: unsigned(8 downto 0);
@@ -134,7 +136,8 @@ begin
         start => fetcher_start,
         done => fetcher_done,
         stall => stall_pipeline,
-        request => fetcher_mem_request,
+        using_memory => fetcher_using_mem,
+        en => fetcher_mem_en,
         address => fetcher_address,
         read_data => mem_read_data,
         cache_x => cache_write_x,
@@ -213,10 +216,10 @@ begin
 
 
     process(all) begin
-        mem_enable <= writer_mem_request or fetcher_mem_request;
-        writer_mem_granted <= not fetcher_mem_request;
+        mem_enable <= writer_mem_request or fetcher_mem_en;
+        writer_mem_granted <= not fetcher_using_mem;
         
-        if writer_mem_request = '1' and fetcher_mem_request = '0' then
+        if writer_mem_request = '1' and fetcher_using_mem = '0' then
             mem_address <= writer_address;
             mem_write <= '1';
         else
