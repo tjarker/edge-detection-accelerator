@@ -54,16 +54,15 @@ class Cache extends Module {
   val shuffledLines = shuffleLines(shuffleGroups, RegNext(in.y(1), 0.B))
   val shuffledLinesBytes = splitWords(shuffledLines)
 
-  val xReg = RegNext(in.x(2,0), 0.U)
-  val columnSelects = Seq(xReg - 1.U, xReg, xReg + 1.U)
+  val columnSelects = RegNext(Seq(in.x(2,0) - 1.U, in.x(2,0), in.x(2,0) + 1.U).toVec, Seq.fill(3)(0.U).toVec)
   val columnSelected = selectColumns(shuffledLinesBytes, columnSelects.map(_(1,0)))
 
   val window = selectBanks(columnSelected, columnSelects.map(_(2))).to2dVec
 
-  val topEdge = in.y === 0.U
-  val bottomEdge = in.y === 287.U
-  val leftEdge = in.x === 0.U
-  val rightEdge = in.x === 351.U
+  val topEdge = RegNext(in.y === 0.U, 0.B)
+  val bottomEdge = RegNext(in.y === 287.U, 0.B)
+  val leftEdge = RegNext(in.x === 0.U, 0.B)
+  val rightEdge = RegNext(in.x === 351.U, 0.B)
 
   val mirror = Seq(
     Seq(

@@ -62,6 +62,12 @@ module Cache(
   reg [31:0] _RAND_32;
   reg [31:0] _RAND_33;
   reg [31:0] _RAND_34;
+  reg [31:0] _RAND_35;
+  reg [31:0] _RAND_36;
+  reg [31:0] _RAND_37;
+  reg [31:0] _RAND_38;
+  reg [31:0] _RAND_39;
+  reg [31:0] _RAND_40;
 `endif // RANDOMIZE_REG_INIT
   reg [31:0] mem_0_0 [0:43]; // @[Cache.scala 25:36]
   wire  mem_0_0_memOut_MPORT_en; // @[Cache.scala 25:36]
@@ -191,9 +197,11 @@ module Cache(
     [17],_GEN_73[16]}; // @[Helpers.scala 19:78]
   wire [7:0] shuffledLinesBytes_0_3_3 = {_GEN_73[31],_GEN_73[30],_GEN_73[29],_GEN_73[28],_GEN_73[27],_GEN_73[26],_GEN_73
     [25],_GEN_73[24]}; // @[Helpers.scala 19:78]
-  reg [2:0] columnSelects_1; // @[Cache.scala 57:21]
-  wire [2:0] columnSelects_0 = columnSelects_1 - 3'h1; // @[Cache.scala 58:32]
-  wire [2:0] columnSelects_2 = columnSelects_1 + 3'h1; // @[Cache.scala 58:50]
+  wire [2:0] _columnSelects_T_2 = in_x[2:0] - 3'h1; // @[Cache.scala 57:45]
+  wire [2:0] _columnSelects_T_6 = in_x[2:0] + 3'h1; // @[Cache.scala 57:73]
+  reg [2:0] columnSelects_0; // @[Cache.scala 57:30]
+  reg [2:0] columnSelects_1; // @[Cache.scala 57:30]
+  reg [2:0] columnSelects_2; // @[Cache.scala 57:30]
   wire [7:0] _GEN_75 = 2'h1 == columnSelects_0[1:0] ? shuffledLinesBytes_0_0_1 : shuffledLinesBytes_0_0_0; // @[Helpers.scala 8:{53,53}]
   wire [7:0] _GEN_76 = 2'h2 == columnSelects_0[1:0] ? shuffledLinesBytes_0_0_2 : _GEN_75; // @[Helpers.scala 8:{53,53}]
   wire [7:0] _GEN_77 = 2'h3 == columnSelects_0[1:0] ? shuffledLinesBytes_0_0_3 : _GEN_76; // @[Helpers.scala 8:{53,53}]
@@ -318,14 +326,14 @@ module Cache(
   wire [7:0] window_3_0 = columnSelects_0[2] ? _GEN_113 : _GEN_89; // @[Helpers.scala 8:{53,53}]
   wire [7:0] window_3_1 = columnSelects_1[2] ? _GEN_145 : _GEN_129; // @[Helpers.scala 8:{53,53}]
   wire [7:0] window_3_2 = columnSelects_2[2] ? _GEN_177 : _GEN_161; // @[Helpers.scala 8:{53,53}]
-  wire  topEdge = in_y == 9'h0; // @[Cache.scala 63:22]
-  wire  bottomEdge = in_y == 9'h11f; // @[Cache.scala 64:25]
-  wire  leftEdge = in_x == 9'h0; // @[Cache.scala 65:23]
-  wire  rightEdge = in_x == 9'h15f; // @[Cache.scala 66:24]
-  wire  _T_10 = topEdge & leftEdge; // @[Cache.scala 70:20]
-  wire  _T_11 = topEdge & rightEdge; // @[Cache.scala 72:20]
-  wire  _T_12 = bottomEdge & leftEdge; // @[Cache.scala 85:23]
-  wire  _T_13 = bottomEdge & rightEdge; // @[Cache.scala 87:23]
+  reg  topEdge; // @[Cache.scala 62:24]
+  reg  bottomEdge; // @[Cache.scala 63:27]
+  reg  leftEdge; // @[Cache.scala 64:25]
+  reg  rightEdge; // @[Cache.scala 65:26]
+  wire  _T_10 = topEdge & leftEdge; // @[Cache.scala 69:20]
+  wire  _T_11 = topEdge & rightEdge; // @[Cache.scala 71:20]
+  wire  _T_12 = bottomEdge & leftEdge; // @[Cache.scala 84:23]
+  wire  _T_13 = bottomEdge & rightEdge; // @[Cache.scala 86:23]
   wire [7:0] _T_14 = leftEdge ? window_0_1 : window_0_0; // @[Mux.scala 101:16]
   wire [7:0] _T_15 = topEdge ? window_1_0 : _T_14; // @[Mux.scala 101:16]
   wire [7:0] _T_18 = rightEdge ? window_0_1 : window_0_2; // @[Mux.scala 101:16]
@@ -334,7 +342,7 @@ module Cache(
   wire [7:0] _T_26 = bottomEdge ? window_2_0 : _T_25; // @[Mux.scala 101:16]
   wire [7:0] _T_29 = rightEdge ? window_3_1 : window_3_2; // @[Mux.scala 101:16]
   wire [7:0] _T_30 = bottomEdge ? window_2_2 : _T_29; // @[Mux.scala 101:16]
-  reg  out_valid_REG; // @[Cache.scala 92:23]
+  reg  out_valid_REG; // @[Cache.scala 91:23]
   assign mem_0_0_memOut_MPORT_en = mem_0_0_memOut_MPORT_en_pipe_0;
   assign mem_0_0_memOut_MPORT_addr = mem_0_0_memOut_MPORT_addr_pipe_0;
   `ifndef RANDOMIZE_GARBAGE_ASSIGN
@@ -443,7 +451,7 @@ module Cache(
   assign out_window_3_0 = _T_12 ? window_2_1 : _T_26; // @[Mux.scala 101:16]
   assign out_window_3_1 = bottomEdge ? window_2_1 : window_3_1; // @[Mux.scala 101:16]
   assign out_window_3_2 = _T_13 ? window_2_1 : _T_30; // @[Mux.scala 101:16]
-  assign out_valid = out_valid_REG; // @[Cache.scala 92:13]
+  assign out_valid = out_valid_REG; // @[Cache.scala 91:13]
   always @(posedge clock) begin
     if (mem_0_0_MPORT_1_en & mem_0_0_MPORT_1_mask) begin
       mem_0_0[mem_0_0_MPORT_1_addr] <= mem_0_0_MPORT_1_data; // @[Cache.scala 25:36]
@@ -538,15 +546,45 @@ module Cache(
     end else begin
       shuffledLines_REG <= in_y[1]; // @[Cache.scala 54:58]
     end
-    if (reset) begin // @[Cache.scala 57:21]
-      columnSelects_1 <= 3'h0; // @[Cache.scala 57:21]
+    if (reset) begin // @[Cache.scala 57:30]
+      columnSelects_0 <= 3'h0; // @[Cache.scala 57:30]
     end else begin
-      columnSelects_1 <= in_x[2:0]; // @[Cache.scala 57:21]
+      columnSelects_0 <= _columnSelects_T_2; // @[Cache.scala 57:30]
     end
-    if (reset) begin // @[Cache.scala 92:23]
-      out_valid_REG <= 1'h0; // @[Cache.scala 92:23]
+    if (reset) begin // @[Cache.scala 57:30]
+      columnSelects_1 <= 3'h0; // @[Cache.scala 57:30]
     end else begin
-      out_valid_REG <= in_valid; // @[Cache.scala 92:23]
+      columnSelects_1 <= in_x[2:0]; // @[Cache.scala 57:30]
+    end
+    if (reset) begin // @[Cache.scala 57:30]
+      columnSelects_2 <= 3'h0; // @[Cache.scala 57:30]
+    end else begin
+      columnSelects_2 <= _columnSelects_T_6; // @[Cache.scala 57:30]
+    end
+    if (reset) begin // @[Cache.scala 62:24]
+      topEdge <= 1'h0; // @[Cache.scala 62:24]
+    end else begin
+      topEdge <= in_y == 9'h0; // @[Cache.scala 62:24]
+    end
+    if (reset) begin // @[Cache.scala 63:27]
+      bottomEdge <= 1'h0; // @[Cache.scala 63:27]
+    end else begin
+      bottomEdge <= in_y == 9'h11f; // @[Cache.scala 63:27]
+    end
+    if (reset) begin // @[Cache.scala 64:25]
+      leftEdge <= 1'h0; // @[Cache.scala 64:25]
+    end else begin
+      leftEdge <= in_x == 9'h0; // @[Cache.scala 64:25]
+    end
+    if (reset) begin // @[Cache.scala 65:26]
+      rightEdge <= 1'h0; // @[Cache.scala 65:26]
+    end else begin
+      rightEdge <= in_x == 9'h15f; // @[Cache.scala 65:26]
+    end
+    if (reset) begin // @[Cache.scala 91:23]
+      out_valid_REG <= 1'h0; // @[Cache.scala 91:23]
+    end else begin
+      out_valid_REG <= in_valid; // @[Cache.scala 91:23]
     end
   end
 // Register and memory initialization
@@ -656,9 +694,21 @@ initial begin
   _RAND_32 = {1{`RANDOM}};
   shuffledLines_REG = _RAND_32[0:0];
   _RAND_33 = {1{`RANDOM}};
-  columnSelects_1 = _RAND_33[2:0];
+  columnSelects_0 = _RAND_33[2:0];
   _RAND_34 = {1{`RANDOM}};
-  out_valid_REG = _RAND_34[0:0];
+  columnSelects_1 = _RAND_34[2:0];
+  _RAND_35 = {1{`RANDOM}};
+  columnSelects_2 = _RAND_35[2:0];
+  _RAND_36 = {1{`RANDOM}};
+  topEdge = _RAND_36[0:0];
+  _RAND_37 = {1{`RANDOM}};
+  bottomEdge = _RAND_37[0:0];
+  _RAND_38 = {1{`RANDOM}};
+  leftEdge = _RAND_38[0:0];
+  _RAND_39 = {1{`RANDOM}};
+  rightEdge = _RAND_39[0:0];
+  _RAND_40 = {1{`RANDOM}};
+  out_valid_REG = _RAND_40[0:0];
 `endif // RANDOMIZE_REG_INIT
   `endif // RANDOMIZE
 end // initial

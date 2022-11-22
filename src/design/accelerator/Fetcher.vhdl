@@ -175,7 +175,7 @@ begin
             current_addr <= (others => '0');
             state <= Setup_read_1;
         else
-            cache_x <= next_next_addr_x;
+            cache_x <= next_next_addr_x(6 downto 0) & "00";
             cache_y(0) <= next_next_addr_y(0);
             cache_y(1) <= next_next_addr_y(1);
             next_next_addr_y <= next_addr_y;
