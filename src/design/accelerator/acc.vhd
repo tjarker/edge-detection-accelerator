@@ -95,6 +95,7 @@ begin
         fetcher_start <= '0';
         sequencer_start <= '0';
         finish <= '0';
+        next_state <= state;
 
         case state is
             when idle =>
