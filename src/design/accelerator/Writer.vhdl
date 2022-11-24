@@ -24,7 +24,7 @@ end entity;
 
 architecture Behavioral of Writer is
 
-    type state_t is (Collect, WriteLeft, WriteRight);
+    type state_t is (CollectIdle, Collect, WriteLeft, WriteRight);
     signal state, state_next: state_t;
 
     signal counter, counter_next: unsigned(1 downto 0);
@@ -49,7 +49,7 @@ begin
 
         address_reg_next <= address_reg;
         request <= '0';
-        done <= '1' when address_reg = to_unsigned(25343, 16) else '0';
+        done <= '0';
         address <= std_logic_vector(address_reg);
         write_data <= left_block;
 
@@ -59,17 +59,29 @@ begin
         
 
         case state is
+            when CollectIdle =>
+                state_next <= WriteLeft when new_blocks = '1' else CollectIdle;
+                done <= '1';
             when Collect =>
                 state_next <= WriteLeft when new_blocks = '1' else Collect;
             when WriteLeft =>
                 state_next <= WriteRight when granted  = '1' else WriteLeft;
                 request <= '1';
             when WriteRight =>
-                state_next <= Collect when granted = '1' else WriteRight;
+                if granted = '1' then
+                    x_reg_next <= (others => '0') when x_reg = to_unsigned(87,16) else x_reg + 1;
+                    address_reg_next <= address_reg + to_unsigned(89,16) when x_reg = to_unsigned(87,16) else address_reg + 1;
+                    if address_reg = to_unsigned(25255, 16) then
+                        state_next <= CollectIdle;
+                    else
+                        state_next <= Collect;
+                    end if;
+                else
+                    state_next <= WriteRight;
+                end if;
                 request <= '1';
                 address <= std_logic_vector(address_reg + to_unsigned(88,16));
-                x_reg_next <= (others => '0') when x_reg = to_unsigned(43,16) else x_reg + 1;
-                address_reg_next <= address_reg + to_unsigned(88,16) when x_reg = to_unsigned(43,16) else address_reg + 1;
+            when others =>
         end case;
     end process;
 
