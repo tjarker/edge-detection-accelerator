@@ -66,7 +66,7 @@ begin
             when CollectIdle =>
                 state_next <= WriteLeft when counter = "11" and valid = '1' else CollectIdle;
                 done <= '1';
-                address_reg_next <= (others => '0');
+                address_reg_next <= x"6300";
             when Collect =>
                 state_next <= WriteLeft when counter = "11" and valid = '1' else Collect;
             when WriteLeft =>
@@ -100,7 +100,7 @@ begin
             right_block <= (others => '0') when reset = '1' else right_block_next;
             left_shift_reg <= (others => '0') when reset = '1' else left_shift_reg_next;
             right_shift_reg <= (others => '0') when reset = '1' else right_shift_reg_next;
-            address_reg <= (others => '0') when reset = '1' else address_reg_next;
+            address_reg <= x"6300" when reset = '1' else address_reg_next;
             x_reg <= (others => '0') when reset = '1' else x_reg_next;
             valid_counter <= (others => '0') when reset = '1' else valid_counter_next;
         end if;
