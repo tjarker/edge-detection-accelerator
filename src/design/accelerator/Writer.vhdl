@@ -60,7 +60,7 @@ begin
 
         case state is
             when Collect =>
-                state_next <= WriteLeft when counter = "11" else Collect;
+                state_next <= WriteLeft when new_blocks = '1' else Collect;
             when WriteLeft =>
                 state_next <= WriteRight when granted  = '1' else WriteLeft;
                 request <= '1';
