@@ -185,7 +185,7 @@ begin
         reset => reset,
         pixel_left => left_pixel,
         pixel_right => right_pixel,
-        valid => pixel_valid,
+        valid => cache_read_valid,
         done => writer_done,
         request => writer_mem_request,
         granted => writer_mem_granted,
@@ -228,12 +228,7 @@ begin
         end if;
 
     end process;
-    
-    process(clock) begin
-        if rising_edge(clock) then
-            pixel_valid <= '0' when reset = '1' else cache_read_valid;
-        end if;
-    end process;
+   
     
 
     
