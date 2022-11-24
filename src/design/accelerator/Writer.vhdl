@@ -37,6 +37,8 @@ architecture Behavioral of Writer is
     signal address_reg, address_reg_next: unsigned(15 downto 0);
     signal x_reg, x_reg_next: unsigned(7 downto 0);
 
+    signal valid_counter, valid_counter_next: unsigned(15 downto 0);
+
 begin
 
     process(all) begin
@@ -55,6 +57,8 @@ begin
 
         x_reg_next <= x_reg;
         
+        valid_counter_next <= valid_counter + 1 when valid = '1' else valid_counter;
+        
         new_blocks_next <= '1' when valid = '1' and counter = "11" else '0';
         
 
@@ -62,6 +66,7 @@ begin
             when CollectIdle =>
                 state_next <= WriteLeft when new_blocks = '1' else CollectIdle;
                 done <= '1';
+                address_reg_next <= (others => '0');
             when Collect =>
                 state_next <= WriteLeft when new_blocks = '1' else Collect;
             when WriteLeft =>
@@ -81,6 +86,7 @@ begin
                 end if;
                 request <= '1';
                 address <= std_logic_vector(address_reg + to_unsigned(88,16));
+                write_data <= right_block;
             when others =>
         end case;
     end process;
@@ -96,6 +102,7 @@ begin
             right_shift_reg <= (others => '0') when reset = '1' else right_shift_reg_next;
             address_reg <= (others => '0') when reset = '1' else address_reg_next;
             x_reg <= (others => '0') when reset = '1' else x_reg_next;
+            valid_counter <= (others => '0') when reset = '1' else valid_counter_next;
         end if;
     end process;
 

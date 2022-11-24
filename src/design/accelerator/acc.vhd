@@ -100,7 +100,7 @@ begin
         case state is
             when idle =>
                 fetcher_start <= start;
-                next_state <= delay0 when start = '1' else idle;
+                next_state <= delay1 when start = '1' else idle;
             when delay0 =>
                 next_state <= delay1;
             when delay1 =>
