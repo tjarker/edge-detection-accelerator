@@ -31,8 +31,8 @@ architecture Behavioral of Writer is
     signal new_blocks, new_blocks_next: std_logic;
     signal left_block, left_block_next: std_logic_vector(31 downto 0);
     signal right_block, right_block_next: std_logic_vector(31 downto 0);
-    signal left_shift_reg, left_shift_reg_next: std_logic_vector(31 downto 0);
-    signal right_shift_reg, right_shift_reg_next: std_logic_vector(31 downto 0);
+    signal left_shift_reg, left_shift_reg_next: std_logic_vector(23 downto 0);
+    signal right_shift_reg, right_shift_reg_next: std_logic_vector(23 downto 0);
 
     signal address_reg, address_reg_next: unsigned(15 downto 0);
     signal x_reg, x_reg_next: unsigned(7 downto 0);
@@ -43,11 +43,11 @@ begin
 
     process(all) begin
     
-        left_shift_reg_next <= left_shift_reg(31 downto 8) & pixel_left when valid = '1' else left_shift_reg;
-        right_shift_reg_next <= right_shift_reg(31 downto 8) & pixel_right when valid = '1' else right_shift_reg;
+        left_shift_reg_next <= left_shift_reg(23 downto 8) & pixel_left when valid = '1' else left_shift_reg;
+        right_shift_reg_next <= right_shift_reg(23 downto 8) & pixel_right when valid = '1' else right_shift_reg;
         counter_next <= counter + 1 when valid = '1' else counter;
-        left_block_next <= left_shift_reg when new_blocks= '1' else left_block; 
-        right_block_next <= right_shift_reg when new_blocks= '1' else right_block; 
+        left_block_next <= left_shift_reg & pixel_left when counter = "11" and valid = '1' else left_block; 
+        right_block_next <= right_shift_reg & pixel_right when counter = "11" and valid = '1' else right_block; 
 
         address_reg_next <= address_reg;
         request <= '0';
@@ -64,11 +64,11 @@ begin
 
         case state is
             when CollectIdle =>
-                state_next <= WriteLeft when new_blocks = '1' else CollectIdle;
+                state_next <= WriteLeft when counter = "11" and valid = '1' else CollectIdle;
                 done <= '1';
                 address_reg_next <= (others => '0');
             when Collect =>
-                state_next <= WriteLeft when new_blocks = '1' else Collect;
+                state_next <= WriteLeft when counter = "11" and valid = '1' else Collect;
             when WriteLeft =>
                 state_next <= WriteRight when granted  = '1' else WriteLeft;
                 request <= '1';
