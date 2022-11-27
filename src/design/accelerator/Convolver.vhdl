@@ -32,7 +32,7 @@ signal DXinv: signed(9 downto 0);
 signal DYinv: signed(9 downto 0);
 signal Dxabs: signed(9 downto 0);
 signal Dyabs: signed(9 downto 0);
-signal Dnabs: unsigned(10 downto 0);
+signal Dnabs: signed(10 downto 0);
 begin
 
     -- dummy connection
@@ -40,13 +40,14 @@ begin
     DXb <= signed(neighborhood(1,2)) - signed(neighborhood(1,0));
     DXc <= signed(neighborhood(2,2)) - signed(neighborhood(2,0));
     
-    Dxaext <= Dxa(7) & Dxa(7) & Dxa(7 downto 0);
-    Dxbext <= Dxb(7) & Dxb(7) & Dxb(7 downto 0);
-    Dxcext <= Dxc(7) & Dxc(7) & Dxc(7 downto 0);
     
     DYa <= signed(neighborhood(0,0)) - signed(neighborhood(2,0)); 
     DYb <= signed(neighborhood(0,1)) - signed(neighborhood(2,1));
     DYc <= signed(neighborhood(0,2)) - signed(neighborhood(2,2));
+    
+    Dxaext <= Dxa(7) & Dxa(7) & Dxa(7 downto 0);
+    Dxbext <= Dxb(7) & Dxb(7) & Dxb(7 downto 0);
+    Dxcext <= Dxc(7) & Dxc(7) & Dxc(7 downto 0);
     
     DYaext <= DYa(7) & DYa(7) & DYa(7 downto 0);
     DYbext <= DYb(7) & DYb(7) & DYb(7 downto 0);
@@ -67,7 +68,7 @@ begin
 
      Dxext <= Dxabs(9) & Dxabs(9 downto 0);
      DYext <= DYabs(9) & DYabs(9 downto 0);
-     Dnabs <= unsigned(DXext + DYext);
-    pixel <= std_logic_vector(Dnabs(10 downto 3));
+     Dnabs <= DXext + DYext;
+    pixel <= std_logic_vector(Dnabs(9 downto 2));
     
 end architecture;
