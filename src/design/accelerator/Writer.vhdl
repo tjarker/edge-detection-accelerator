@@ -43,11 +43,11 @@ begin
 
     process(all) begin
     
-        left_shift_reg_next <= left_shift_reg(15 downto 0) & pixel_left when valid = '1' else left_shift_reg;
-        right_shift_reg_next <= right_shift_reg(15 downto 0) & pixel_right when valid = '1' else right_shift_reg;
+        left_shift_reg_next <= pixel_left & left_shift_reg(23 downto 8)  when valid = '1' else left_shift_reg;
+        right_shift_reg_next <=  pixel_right & right_shift_reg(23 downto 8) when valid = '1' else right_shift_reg;
         counter_next <= counter + 1 when valid = '1' else counter;
-        left_block_next <= left_shift_reg & pixel_left when counter = "11" and valid = '1' else left_block; 
-        right_block_next <= right_shift_reg & pixel_right when counter = "11" and valid = '1' else right_block; 
+        left_block_next <=  pixel_left & left_shift_reg when counter = "11" and valid = '1' else left_block; 
+        right_block_next <= pixel_right & right_shift_reg when counter = "11" and valid = '1' else right_block; 
 
         address_reg_next <= address_reg;
         request <= '0';
