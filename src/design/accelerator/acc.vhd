@@ -44,7 +44,7 @@ end acc;
 
 architecture rtl of acc is
 
-    type state_type is ( idle, delay0, delay1, delay2, busy, finished );
+    type state_type is ( idle, delay0, delay1, delay2, busy, wait_start, finished );
 
     signal state, next_state: state_type;
 
@@ -109,10 +109,13 @@ begin
                 sequencer_start <= '1';
                 next_state <= busy;
             when busy =>
-                next_state <= finished when writer_done = '1' else busy;
+                next_state <= wait_start when writer_done = '1' else busy;
+            when wait_start =>
+                finish <= '1';
+                next_state <= finished when start = '0' else wait_start;
             when finished =>
                 finish <= '1';
-                next_state <= delay0 when start = '1' else finished;
+                next_state <= idle when start = '1' else finished;
             when others =>
         end case;
 
