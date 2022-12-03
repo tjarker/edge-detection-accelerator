@@ -66,6 +66,9 @@ case(state) is
             next_addr <= current_addr + width;
             next_state <= Setup_read_2;
         else
+            next_addr_x <= (others => '0');
+            next_addr_y <= (others => '0');
+            next_addr <= (others => '0');
             using_memory <= '0';
             next_state <= Setup_read_1;
         end if;
@@ -161,7 +164,7 @@ case(state) is
        when ending =>    
                  done <= '1';   
                  using_memory <= '0';
-                 next_state <= ending;                                        
+                 next_state <= Setup_read_1;                                        
         end case;
    
 end process comb;
