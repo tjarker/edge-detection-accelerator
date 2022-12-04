@@ -46,6 +46,8 @@ signal net:  STD_LOGIC_VECTOR (16 downto 0);
 signal current_addr_x, current_addr_y:  unsigned (8 downto 0);
 signal un_x, un_y: unsigned(8 downto 0);
 
+signal min_addr_y, sub_addr_y : unsigned(8 downto 0);
+
 begin
 comb : process (state, current_addr, current_addr_x, current_addr_y, start, next_addr, next_addr_x, next_addr_y, read_data, 
 width, widthdec, width2dec, heightdecdec) 
@@ -59,6 +61,8 @@ cache_data <= read_data;
 en <= '1';
 using_memory <= '1';
 cache_write <= '0';
+min_addr_y <= "000000001";
+sub_addr_y <= current_addr_y - min_addr_y;
 case(state) is
     when Setup_read_1 => 
         if(start = '1') then
@@ -85,7 +89,8 @@ case(state) is
                 cache_write <= '1';
             end if; 
             next_addr_x <= current_addr_x + 1;
-            next_addr_y <= current_addr_y - 2;
+            min_addr_y <= "000000010";
+            next_addr_y <= sub_addr_y;
             next_addr <= current_addr - width2dec;   
             next_state <= Loop_1st_row_B;
     when Loop_1st_row_B =>    
@@ -112,7 +117,7 @@ case(state) is
             end if;
       when Mainloop_switchrow =>
             next_addr_x <= (others => '0');
-            next_addr_y <= current_addr_y + 1; 
+            next_addr_y <= current_addr_y + 1;
             next_addr <= current_addr + 1;
             next_state <= Mainloop_A;
       when Mainloop_A =>
@@ -136,7 +141,7 @@ case(state) is
             using_memory <= '0';
       when Mainloop_switch_column => 
                 next_addr_x <= current_addr_x + 1;
-                next_addr_y <= current_addr_y - 1;
+                next_addr_y <= sub_addr_y;
                 next_addr <= current_addr - widthdec;
                 next_state <= Mainloop_A;
        when Loop_last_row_A =>  
